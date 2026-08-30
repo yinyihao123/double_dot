@@ -1,0 +1,52 @@
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    base_url="https://api.deepseek.com"
+)
+
+
+def ask_llm(question: str):
+
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {
+                "role": "user",
+                "content": question
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
+
+def ask_llm_with_context(context: str):
+
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {
+                "role": "user",
+                "content": context
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
+
+def ask_llm_agent(context: str):
+
+    response = client.chat.completions.create(
+        model="deepseek-chat",
+        messages=[
+            {
+                "role": "user",
+                "content": context
+            }
+        ]
+    )
+
+    return response.choices[0].message.content
