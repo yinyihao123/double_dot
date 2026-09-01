@@ -1,12 +1,11 @@
-from tools import TOOLS
+from tool_registry import ToolRegistry
 
 
 class MCPServer:
 
 
-    def __init__(self):
-
-        self.tools = TOOLS
+    def __init__(self, registry: ToolRegistry):
+        self.registry = registry
 
 
 
@@ -16,17 +15,7 @@ class MCPServer:
         返回所有工具描述
         """
 
-        result = []
-
-
-        for tool in self.tools.values():
-
-            result.append(
-                tool.schema()
-            )
-
-
-        return result
+        return self.registry.list_tools()
 
     def call_tool(
         self,
@@ -34,16 +23,4 @@ class MCPServer:
         arguments
     ):
 
-        if name not in self.tools:
-
-            raise Exception(
-                f"Tool不存在:{name}"
-            )
-
-
-        tool = self.tools[name]
-
-
-        return tool.func(
-            **arguments
-        )
+        return self.registry.call(name, arguments)

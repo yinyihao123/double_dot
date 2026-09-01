@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from mcp_core import MCPServer
+from tools import registry
 
 
 app = FastAPI()
 
 
-mcp = MCPServer()
+mcp = MCPServer(registry)
 
 
 
@@ -30,11 +31,34 @@ def handle_mcp(request:dict):
 
         params=request["params"]
 
+        tool_name = params.get("name")
+        arguments = params.get("arguments", {})
 
-        result=mcp.call_tool(
-            params["name"],
-            params.get("arguments",{})
-        )
+        if not tool_name:
+            return {
+                "error": {
+                    "type": "invalid_request",
+                    "message": "missing tool name"
+                }
+            }
+
+        if not mcp.registry.has_tool(tool_name):
+            return {
+                "error": {
+                    "type": "tool_not_found",
+                    "message": f"Tool不存在:{tool_name}"
+                }
+            }
+
+        try:
+            result=mcp.call_tool(tool_name, arguments)
+        except Exception as exc:
+            return {
+                "error": {
+                    "type": "tool_execution_failed",
+                    "message": str(exc)
+                }
+            }
 
 
         return {
